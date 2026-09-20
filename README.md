@@ -1,3 +1,4 @@
+https://clinic-appointment-system-eosin.vercel.app
 # Clinic Appointment System — ระบบนัดหมายและจัดคิวคลินิก
 
 โปรเจกต์ตัวอย่าง **Full-Stack Web Application ที่ออกแบบด้วยหลัก OOP อย่างเต็มรูปแบบ**
