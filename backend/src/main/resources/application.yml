@@ -36,7 +36,9 @@ spring:
     password: ${DB_PASSWORD:clinic}
   jpa:
     hibernate:
-      ddl-auto: validate
+      # update = Hibernate สร้าง/ปรับตารางให้อัตโนมัติจาก Entity ตอน deploy ครั้งแรก
+      # (สะดวกสำหรับสาธิต/งานส่งอาจารย์ — ระบบจริงควรใช้ Flyway/Liquibase + validate แทน)
+      ddl-auto: update
     open-in-view: false
 
 clinic:
@@ -56,7 +58,7 @@ clinic:
     seed-default-password: ${SEED_PASSWORD:Clinic@123}
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 springdoc:
   swagger-ui:

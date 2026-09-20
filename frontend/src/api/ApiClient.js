@@ -38,7 +38,9 @@ export class TokenStore {
 }
 
 export class ApiClient {
-  constructor(baseUrl = '/api') {
+  // ตอน deploy จริง (Vercel) ตั้งค่า VITE_API_URL ชี้ไปที่ backend บน Render เช่น
+  // https://clinic-backend-xxxx.onrender.com/api — ถ้าไม่ตั้งจะใช้ '/api' (proxy ของ Vite ตอนรันในเครื่อง)
+  constructor(baseUrl = import.meta.env.VITE_API_URL || '/api') {
     this.baseUrl = baseUrl
     this.onUnauthorized = null
   }

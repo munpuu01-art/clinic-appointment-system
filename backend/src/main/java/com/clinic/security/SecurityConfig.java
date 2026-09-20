@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,6 +33,11 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
     private final ObjectMapper objectMapper;
+
+    // โดเมนของ frontend ที่ deploy จริง (เช่น https://clinic-app.vercel.app) — ตั้งผ่าน
+    // environment variable FRONTEND_URL บน Render ได้ ถ้าไม่ตั้งจะไม่มีผลอะไรเพิ่ม
+    @Value("${FRONTEND_URL:}")
+    private String frontendUrl;
 
     public SecurityConfig(JwtAuthenticationFilter jwtFilter, ObjectMapper objectMapper) {
         this.jwtFilter = jwtFilter;
@@ -103,13 +109,18 @@ public class SecurityConfig {
     public CorsConfigurationSource corsSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000"));
-        // อนุญาต origin แบบ ngrok เพิ่ม เพราะ ngrok แจกโดเมนแบบสุ่มใหม่ทุกครั้งที่เปิด tunnel
-        // (ใช้เฉพาะตอนสาธิต/ทดสอบ — โปรดักชันจริงควรระบุโดเมนตายตัวเท่านั้น)
-        config.setAllowedOriginPatterns(List.of(
+        // อนุญาต origin แบบ ngrok/Vercel เพิ่ม เพราะโดเมนของทั้งสองบริการมีรูปแบบตายตัว
+        // แต่ subdomain เปลี่ยนได้ทุกครั้งที่ deploy ใหม่
+        java.util.ArrayList<String> patterns = new java.util.ArrayList<>(List.of(
                 "http://localhost:*",
                 "https://*.ngrok-free.app",
                 "https://*.ngrok-free.dev",
-                "https://*.ngrok.io"));
+                "https://*.ngrok.io",
+                "https://*.vercel.app"));
+        if (frontendUrl != null && !frontendUrl.isBlank()) {
+            patterns.add(frontendUrl.trim());   // โดเมนที่ตั้งไว้ผ่าน FRONTEND_URL (ถ้ามี)
+        }
+        config.setAllowedOriginPatterns(patterns);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

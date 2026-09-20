@@ -28,7 +28,9 @@ import java.time.LocalTime;
 
 /** ข้อมูลตัวอย่างสำหรับ dev/demo (โปรไฟล์ dev เท่านั้น) */
 @Component
-@Profile("dev")
+// ทำงานทั้งโปรไฟล์ dev และ prod เพื่อให้ deploy ขึ้น cloud (Render) แล้วมีบัญชีตัวอย่างให้ใช้ทันที
+// (ป้องกันข้อมูลซ้ำด้วยการเช็ก count()>0 ก่อนเสมอ ดูใน run() ด้านล่าง)
+@Profile({"dev", "prod"})
 public class DataSeeder implements CommandLineRunner {
 
     private final SpecialtyRepository specialtyRepository;
