@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: clinic-appointment-system
+  profiles:
+    active: dev
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:h2:mem:clinicdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/clinicdb}
+    username: ${DB_USER:clinic}
+    password: ${DB_PASSWORD:clinic}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+clinic:
+  booking:
+    advance-days: 60          # จองล่วงหน้าได้ไม่เกินกี่วัน
+    min-lead-minutes: 30      # ต้องจองก่อนเวลาตรวจอย่างน้อยกี่นาที
+    max-per-patient-per-day: 2
+  queue:
+    default-strategy: PRIORITY   # FIFO | PRIORITY | APPOINTMENT_TIME
+  notification:
+    email-enabled: true
+    sms-enabled: true
+  security:
+    # ใน production ให้ตั้งผ่าน environment variable เสมอ
+    jwt-secret: ${JWT_SECRET:clinic-appointment-system-development-secret-key-change-me-please-2026}
+    jwt-expiration-minutes: 480
+    seed-default-password: ${SEED_PASSWORD:Clinic@123}
+
+server:
+  port: 8080
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
